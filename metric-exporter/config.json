@@ -1,0 +1,35 @@
+{
+    "serverinfo": [
+        {
+            "url": "localhost",
+            "port": 8080,
+            "path": "/metrics",
+            "name": "server1"
+        },
+        {
+            "url": "localhost",
+            "port": 8081,
+            "path": "/metrics",
+            "name": "server2"
+        },
+        {
+            "url": "localhost",
+            "port": 8082,
+            "path": "/metrics",
+            "name": "server3"
+        },
+        {
+            "url": "localhost",
+            "port": 8083,
+            "path": "/metrics",
+            "name": "server4"
+        }
+    ],
+    "database": {
+        "url": "http://localhost:8086",
+        "token": "",
+        "org": "",
+        "bucket": ""
+    }
+     
+}

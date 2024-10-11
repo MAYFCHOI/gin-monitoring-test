@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+
+  loki:
+    image: grafana/loki:2.7.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+      - "4317:4317"
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail
+    networks:
+      - monitoring
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - /home/mayf/gophercon2024/logs/test-server.log:/var/log/trace/test-server.log 
+      - /home/mayf/gophercon2024/logs/test-server2.log:/var/log/trace/test-server2.log
+      - /home/mayf/gophercon2024/logs/test-server3.log:/var/log/trace/test-server3.log
+      - /home/mayf/gophercon2024/logs/test-server4.log:/var/log/trace/test-server4.log
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    
+  influxdb:
+    image: influxdb:latest
+    container_name: influx
+    ports:
+      - '8086:8086'
+      - '8085:8085'
+    networks:
+      - monitoring
+    environment:
+      - INFLUXDB_ADMIN_USER_PASSWORD=mayf
+      - INFLUXDB_ADMIN_USER_TOKEN=admin
+      - INFLUXDB_USER=admin
+      - INFLUXDB_USER_PASSWORD=admin
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
+      - INFLUXDB_DB=my_database
+    tty: true
+    stdin_open: true
+
+
+
+networks:
+  monitoring:
+    driver: bridge

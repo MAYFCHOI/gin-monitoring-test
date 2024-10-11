@@ -1,0 +1,41 @@
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+
+ingester:
+  chunk_target_size: 1048576
+  chunk_idle_period: 5m
+  max_chunk_age: 1h
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: s3
+      schema: v10
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/boltdb-cache
+    resync_interval: 1m
+  aws:
+    s3: 
+    insecure: false
+    access_key_id: 
+    secret_access_key: 
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: s3
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules
+  alertmanager_url: http://alertmanager:9093

@@ -1,0 +1,36 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /var/log/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: tracelog
+          __path__: /var/log/trace/*.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) TraceID: (?P<trace_id>[a-z0-9-]+), SpanID: (?P<span_id>[a-z0-9-]+), ParentSpanID: (?P<parent_span_id>[a-z0-9-]*), Method: (?P<method>[A-Z]+), Path: (?P<path>.+), Duration: (?P<duration>[0-9.]+ms), Status: (?P<status>[0-9]+)'
+      - labels:
+          trace_id: trace_id
+          span_id: span_id
+          parent_span_id: parent_span_id
+          method: method
+          path: path
+          duration: duration
+          status: status
+      - timestamp:
+          source: timestamp
+          format: "2006/01/02 15:04:05"
+          location: "UTC"
+      - output:
+          source: message
+          format: json
